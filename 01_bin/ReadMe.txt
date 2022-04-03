@@ -1,0 +1,1 @@
+If you run the software on a PC with Windows OS self generated received data and simulated database stored data will be shown.
