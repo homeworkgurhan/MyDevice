@@ -22,14 +22,16 @@
 #include <iostream>
 #include <chrono>
 #include <mutex>
+#include <functional>
 #include <stop_token>
+#include <condition_variable>
 //## end module%62497FBA023F.additionalIncludes
 
 //## begin module%62497FBA023F.includes preserve=yes
 //## end module%62497FBA023F.includes
 
 // messagesThreading
-#include "messagesThreading.h"
+//#include "messagesThreading.h"
 //## begin module%62497FBA023F.additionalDeclarations preserve=yes
 //## end module%62497FBA023F.additionalDeclarations
 
@@ -54,12 +56,6 @@ class DataReceiver
   public:
     //## Constructors (generated)
       DataReceiver();
-
-      DataReceiver(const DataReceiver &right);
-
-    //## Constructors (specified)
-      //## Operation: DataReceiver%6249BDD80132
-      DataReceiver ();
 
     //## Destructor (generated)
       ~DataReceiver();
@@ -93,9 +89,6 @@ class DataReceiver
     //## Get and Set Operations for Class Attributes (generated)
 
       //## Attribute: mesTr%6249BE6A01CA
-      const messagesThreading get_mesTr () const;
-      void set_mesTr (messagesThreading value);
-
     // Additional Private Declarations
       //## begin DataReceiver%62497FBA023F.private preserve=yes
       //## end DataReceiver%62497FBA023F.private
@@ -104,10 +97,11 @@ class DataReceiver
     // Data Members for Class Attributes
 
       //## begin DataReceiver::mesTr%6249BE6A01CA.attr preserve=no  private: messagesThreading {U} 
-      messagesThreading mesTr;
-      std::mutex mutex_;
-      bool dataReady;
+       std::mutex mutex_;
+      std::condition_variable_any condVar;
       //## end DataReceiver::mesTr%6249BE6A01CA.attr
+public :
+    bool dataReady;
 
     // Additional Implementation Declarations
       //## begin DataReceiver%62497FBA023F.implementation preserve=yes

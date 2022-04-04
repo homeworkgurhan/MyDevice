@@ -21,6 +21,7 @@
 
 // DataReceiver
 #include "DataReceiver.h"
+using namespace std::literals;
 //## begin module%62497FBA023F.additionalDeclarations preserve=yes
 //## end module%62497FBA023F.additionalDeclarations
 
@@ -52,9 +53,10 @@ DataReceiver::~DataReceiver()
 void DataReceiver::ReceiveNewData ()
 {
   //## begin DataReceiver::ReceiveNewData%6249B637005A.body preserve=yes
-    std::jthread t1(DataStore);
-    std::jthread t2(DataReceive);
-
+    //std::jthread t1(DataStore);
+    //std::jthread t2(DataReceive);
+    std::jthread t1(std::bind_front(&DataReceiver::DataStore, this));
+    std::jthread t2(std::bind_front(&DataReceiver::DataReceive, this));
 
     t1.join();
     t2.join();
@@ -65,16 +67,17 @@ void DataReceiver::DataReceive ()
 {
   //## begin DataReceiver::DataReceive%6249C80B00BC.body preserve=yes
        __int64 receivedMessages{ 0 };
-    while (1)
-    {
-        std::this_thread::sleep_for(5ms);
-        {
-            std::lock_guard<std::mutex> lck(mutex_);
+       while (1)
+       {
+           std::this_thread::sleep_for(5ms);
+           {
+               std::lock_guard<std::mutex> lck(mutex_);
 
-            dataReady = true;
-            std::cout << "Data Received :" << receivedMessages++ << '\n';
-        }
-        mesTr.condVar.notify_one();                                  // (3)
+               dataReady = true;
+               std::cout << "Data Received :" << receivedMessages++ << '\n';
+           }
+           condVar.notify_one();                                  // (3)
+       }
   //## end DataReceiver::DataReceive%6249C80B00BC.body
 }
 
@@ -88,7 +91,7 @@ void DataReceiver::DataStore ()
     while (1) {
 
 
-        mesTr.condVar.wait(lck, [] {return dataReady; });
+        condVar.wait(lck, [&] {return dataReady; });
         dataReady = false;
         std::cout << "DataSendToDatabase: " << recordedMessages++ << '\n';
     }
